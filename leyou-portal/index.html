@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7"/>
+    <title>提莫商城--首页</title>
+    <link rel="icon" href="assets/img/favicon.ico">
+
+    <link rel="stylesheet" type="text/css" href="css/webbase.css"/>
+    <link rel="stylesheet" type="text/css" href="css/pages-JD-index.css"/>
+    <link rel="stylesheet" type="text/css" href="css/widget-jquery.autocomplete.css"/>
+    <link rel="stylesheet" type="text/css" href="css/widget-cartPanelView.css"/>
+
+</head>
+
+<body>
+
+<!-- 头部栏位 -->
+<div id="nav-bottom">
+    <ly-top/>
+</div>
+<!--页面顶部，由js动态加载-->
+<script src="./js/vue/vue.js"></script>
+<script src="./js/axios.min.js"></script>
+<script src="./js/common.js"></script>
+<script type="text/javascript">
+    var indexVm = new Vue({
+        el: "#nav-bottom",
+        components: {
+            lyTop: () => import('./js/pages/top.js')
+        }
+    });
+</script>
+
+
+<!--列表-->
+<div id="nav-list">
+    <div class="sort">
+        <div class="py-container">
+            <div class="yui3-g SortList ">
+                <div class="yui3-u Left all-sort-list">
+                    <div class="all-sort-list2">
+                        <div style="padding-top:20px;" class="item" v-for="(category,index) in categories" :key="index">
+                            <h3><a style="padding-left: 30px;" href="javascript:void(0)" @click="search(category.name)">{{category.name}}</a></h3>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="yui3-u Center banerArea">
+                    <!--banner轮播-->
+                    <div id="myCarousel" data-ride="carousel" data-interval="4000" class="sui-carousel slide">
+                        <ol class="carousel-indicators">
+                            <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+                            <li data-target="#myCarousel" data-slide-to="1"></li>
+                            <li data-target="#myCarousel" data-slide-to="2"></li>
+                        </ol>
+                        <div class="carousel-inner">
+                            <div class="active item">
+                                    <img width="750" src="img/homeindex1.jpg"/>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+                <div class="yui3-u Right" style="background: #c81623;: ">
+                    <div class="news">
+
+                        <div class="clearix"></div>
+
+                    </div>
+
+                    <div class="ads">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--推荐-->
+    <div class="show">
+        <div class="py-container">
+            <ul class="yui3-g Recommend">
+                <li class="yui3-u-1-6  clock">
+                    <div class="time" style="padding-top:40px">
+                        <img src="img/clock.png"/>
+                        <h3>今日推荐</h3>
+                    </div>
+                </li>
+                <li class="yui3-u-5-24" v-for="(goods,index) in goodsList" v-if="index<4" :key="index">
+                    <div class="time"><a :href="'item/'+goods.spuId+'.html'" target="_blank">
+                        <img width="170" style="margin-left:20px" :src="goods.images"></a></div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!--喜欢-->
+    <div class="like" style="margin-top:50px">
+        <div class="py-container">
+            <div class="title">
+                <h3 class="fl">猜你喜欢</h3>
+                <b class="border"></b>
+                <a href="javascript:;" class="fr tip changeBnt" id="xxlChg"><i></i></a>
+            </div>
+            <div class="bd">
+                <ul class="clearfix yui3-g Favourate picLB" id="picLBxxl">
+                    <li class="yui3-u-1-6"  v-for="(like,i) in likes" v-if="i<7" :key="i">
+                        <dl class="picDl huozhe">
+                            <dd>
+                                <a :href="'item/'+like.spuId+'.html'" target="_blank"><img :src="like.images" alt=""/></a>
+                                <div class="like-text">
+                                    <p style="overflow: hidden;text-overflow: ellipsis;display: -webkit-box;-webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                                        {{like.title}}
+                                    </p>
+                                    <h3>{{ly.formatPrice(like.price)}}</h3>
+                                </div>
+                            </dd>
+                        </dl>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var indexVm2 = new Vue({
+        el: "#nav-list",
+        data: {
+            ly,
+            categories: [],
+            cid2: [],
+            cdi3: [],
+            show: false,
+            pid: 0,
+            goodsList: [],
+            likes:[],
+        },
+        created() {
+            //发送异步请求获取数据
+            this.loadData();
+        },
+        watch: {
+            cid() {
+                this.loadData();
+            }
+        },
+        methods: {
+            loadData() {
+                ly.http.get("/item/spu/page/recommendedGood").then(({data}) => {
+                    this.goodsList = data;
+                });
+                ly.http.get("/item/category/list")
+                    .then(({data}) => {
+                        this.categories = data;
+                    })
+                    .catch(() => {
+                        this.categories = [];
+                    });
+                ly.http.get("/item/spu/likes").then(({data}) => {
+                    this.likes = data;
+                });
+            },
+            search(sear) {
+                window.location = 'search.html?key=' + sear;
+            },
+        },
+    });
+</script>
+
+
+
+<!-- 底部栏位 -->
+<!--页面底部，由js动态加载-->
+<script type="text/javascript" src="plugins/jquery/jquery.min.js"></script>
+<div class="clearfix footer"></div>
+<script type="text/javascript">$(".footer").load("foot.html");</script>
+<!--页面底部END-->
+
+<!-- 楼层位置 -->
+<div id="floor-index" class="floor-index">
+    <ul>
+        <li>
+            <a class="num" href="javascript:;" style="display: none;">1F</a>
+            <a class="word" href="javascript;;" style="display: block;">家用电器</a>
+        </li>
+        <li>
+            <a class="num" href="javascript:;" style="display: none;">2F</a>
+            <a class="word" href="javascript;;" style="display: block;">手机通讯</a>
+        </li>
+        <li>
+            <a class="num" href="javascript:;" style="display: none;">3F</a>
+            <a class="word" href="javascript;;" style="display: block;">电脑办公</a>
+        </li>
+        <li>
+            <a class="num" href="javascript:;" style="display: none;">4F</a>
+            <a class="word" href="javascript;;" style="display: block;">家居家具</a>
+        </li>
+        <li>
+            <a class="num" href="javascript:;" style="display: none;">5F</a>
+            <a class="word" href="javascript;;" style="display: block;">运动户外</a>
+        </li>
+    </ul>
+</div>
+
+<!--侧栏面板开始,由js动态加载-->
+<div class="J-global-toolbar"></div>
+
+
+<!--购物车单元格 模板-->
+<script type="text/template" id="tbar-cart-item-template">
+    <div class="tbar-cart-item">
+        <div class="jtc-item-promo">
+            <em class="promo-tag promo-mz">满赠<i class="arrow"></i></em>
+            <div class="promo-text"></div>
+        </div>
+        <div class="jtc-item-goods">
+            <span class="p-img"><a href="#" target="_blank"><img src="{2}" alt="{1}" height="50" width="50"/></a></span>
+            <div class="p-name">
+                <a href="#">{1}</a>
+            </div>
+            <div class="p-price"><strong>¥{3}</strong>×{4}</div>
+            <a href="#none" class="p-del J-del">删除</a>
+        </div>
+    </div>
+</script>
+
+<!--侧栏面板结束-->
+<script type="text/javascript" src="js/plugins/jquery/jquery.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $("#service").hover(function () {
+            $(".service").show();
+        }, function () {
+            $(".service").hide();
+        });
+        $("#shopcar").hover(function () {
+            $("#shopcarlist").show();
+        }, function () {
+            $("#shopcarlist").hide();
+        });
+
+    })
+</script>
+
+
+<script type="text/javascript" src="js/model/cartModel.js"></script>
+<script type="text/javascript" src="js/czFunction.js"></script>
+<script type="text/javascript" src="js/plugins/jquery.easing/jquery.easing.min.js"></script>
+<script type="text/javascript" src="js/plugins/sui/sui.min.js"></script>
+<script type="text/javascript" src="js/pages/index.js"></script>
+<script type="text/javascript" src="js/widget/cartPanelView.js"></script>
+<script type="text/javascript" src="js/widget/jquery.autocomplete.js"></script>
+<script type="text/javascript" src="js/widget/nav.js"></script>
+
+</body>
+z
+
+</html>

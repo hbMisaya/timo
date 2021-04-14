@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE">
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7"/>
+    <title>提莫商城--我的订单</title>
+    <link rel="stylesheet" type="text/css" href="css/webbase.css"/>
+    <link rel="stylesheet" type="text/css" href="css/pages-getOrderInfo.css"/>
+</head>
+
+<body>
+<!--header-->
+<div id="ordersApp">
+    <div class="top">
+        <shortcut/>
+    </div>
+    <div id="account">
+        <div class="py-container">
+            <div class="yui3-g home">
+                <!--左侧列表-->
+                <div class="yui3-u-1-6 list">
+
+                    <div class="person-info">
+                        <div class="person-photo"><img src="img/_/photo.png" alt=""></div>
+                        <div class="person-account">
+                            <span class="name">{{user.username}}</span>
+                            <span class="safe"><a href="#">退出登录 </a></span>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="list-items">
+                        <dl>
+                            <dt><i>·</i> 订单中心</dt>
+                            <dd><a href="home-index.html" class="list-active">我的订单</a></dd>
+                        </dl>
+                        <dl>
+                            <dt><i>·</i> 设置</dt>
+                            <dd><a href="home-setting-address.html">地址管理</a></dd>
+                            <dd><a href="home-setting-safe.html">安全管理</a></dd>
+                        </dl>
+                    </div>
+                </div>
+                <!--右侧主内容-->
+                <div class="yui3-u-5-6 order-pay">
+                    <div class="body">
+                        <div class="table-title">
+                            <table class="sui-table  order-table">
+                                <tr>
+                                    <thead>
+                                    <th width="35%">宝贝</th>
+                                    <th width="5%">数量</th>
+                                    <th width="8%">商品操作</th>
+                                    <th width="10%">实付款</th>
+                                    <th width="10%">交易状态</th>
+                                    <th width="10%">交易操作</th>
+                                    </thead>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="order-detail">
+                            <div class="orders">
+                                <div class="choose-order">
+                                    <div class="sui-pagination pagination-large top-pages">
+                                        <ul>
+                                            <li class="prev disabled"><a href="#">上一页</a></li>
+
+                                            <li class="next"><a href="#">下一页</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <!--order2-->
+                                <div v-for="(order,index) in orders" :key="index">
+                                    <div class="choose-title">
+                                        <label data-toggle="checkbox" class="checkbox-pretty ">
+                                            <input type="checkbox" checked="checked"><span>{{order.createTime}}　订单编号：{{order.orderId}} <a>和我联系</a></span>
+                                        </label>
+                                        <a class="sui-btn btn-info share-btn">分享</a>
+                                    </div>
+                                    <table class="sui-table table-bordered order-datatable"
+                                           v-for="(orderDetail,i) in order.orderDetails" :key="i">
+                                        <tbody>
+                                        <tr>
+                                            <td width="35%">
+                                                <div class="typographic"><img src="img/goods.png"/>
+                                                    <a href="javascript:void(0);" @click="goSku(orderDetail.skuId)"
+                                                       class="block-text">{{orderDetail.title}}</a>
+                                                </div>
+                                            </td>
+                                            <td width="5%" class="center">{{orderDetail.num}}</td>
+                                            <td width="8%" class="center">
+                                                <ul class="unstyled">
+                                                    <li>已发货</li>
+                                                    <li><a>退货/退款</a></li>
+                                                </ul>
+                                            </td>
+                                            <td width="10%" class="center" rowspan="2">
+                                                <ul class="unstyled">
+                                                    <li>{{ly.formatPrice(orderDetail.price)}}</li>
+                                                    <li>（含运费：￥0.00）</li>
+                                                </ul>
+                                            </td>
+                                            <td width="10%" class="center" rowspan="2">
+                                                <ul class="unstyled">
+                                                    <li v-if="order.status==1">未付款</li>
+                                                    <li v-else-if="order.status==2">已付款</li>
+                                                    <li v-else-if="order.status==3">已发货</li>
+                                                    <li v-else-if="order.status==4">已确认</li>
+                                                    <li v-else-if="order.status==5">已评价</li>
+                                                    <li v-else>已确认</li>
+                                                    <li><a :href="'home-orderDetail.html?orderId='+order.orderId+''" class="btn">订单详情 </a></li>
+                                                </ul>
+                                            </td>
+                                            <td width="10%" class="center" rowspan="2">
+                                                <ul class="unstyled">
+                                                    <li v-if="order.status==1"><a href="#" class="sui-btn btn-info">取消订单</a></li>
+                                                    <li v-else-if="order.status==2"><a href="#" class="sui-btn btn-info">取消订单</a></li>
+                                                    <li v-else-if="order.status==7">订单已取消</li>
+                                                    <li v-else><a href="#" class="sui-btn btn-info">确认收货</a></li>
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+
+                            </div>
+                            <div class="choose-order">
+                                <div class="sui-pagination pagination-large top-pages">
+                                    <ul>
+                                        <li class="prev" :class="{disabled: page==1}" @click="prev()">
+                                            <a href="#">«上一页</a>
+                                        </li>
+                                        <li :class="{active: page === index(i)}"
+                                            v-for="i in Math.min(5,totalPage)" @click="page=index(i)">
+                                            <a href="#">{{index(i)}}</a>
+                                        </li>
+
+                                        <li class="dotted"><span>...</span></li>
+                                        <li class="next" :class="{disabled: page==totalPage}" @click="next()">
+                                            <a href="#">下一页»</a>
+                                        </li>
+                                    </ul>
+                                    <div><span>共{{totalPage}}页&nbsp;</span><span>
+                                            到
+                                            <input type="text" class="page-num"><button class="page-confirm"
+                                                                                        onclick="alert(1)">确定</button>
+                                            页</span></div>
+                                </div>
+                            </div>
+
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="./js/vue/vue.js"></script>
+<script src="./js/axios.min.js"></script>
+<script src="./js/common.js"></script>
+<script type="text/javascript">
+    var ordersApp = new Vue({
+        el: "#ordersApp",
+        data: {
+            ly,
+            page: 1,
+            user: null,
+            orders: [], // 当前页品牌数据
+            totalPage: 1,
+            total: 0,
+        },
+        computed: {
+            totals() {
+                return this.carts.reduce((c1, c2) => c1 + c2.num, 0)
+            },
+            totalPrice() {
+                return this.carts.reduce((c1, c2) => c1 + c2.num * c2.price, 0)
+            },
+            actualPay() {
+                return this.totalPrice + this.order.postFee - this.fanxian;
+            },
+        },
+        watch: {
+            page: {
+                handler(newVal, oldVal) {
+                    if (!oldVal || !oldVal.key) {
+                        this.loadData();
+                        return;
+                    }
+                    window.location = "http://www.leyou.com/html?" + ly.stringify(this.page);
+                }
+            }
+        },
+        created() {
+            ly.verify().then(res => {
+                        this.user = res.data;
+                this.loadData();
+            }).catch(() => {
+                //未登录购物车的查询
+                window.location = "http://www.leyou.com/login.html?returnUrl=http://www.leyou.com/cart.html";
+            })
+        },
+        components: {
+            shortcut: () => import("/js/pages/shortcut.js")
+        },
+        methods: {
+            loadData() {
+                ly.verify().then(res => {
+                    ly.http.get("/order/order/list?page=" + this.page
+                    ).then(({data}) => { // 这里使用箭头函数
+                        this.orders = data.items;
+                        this.total = data.total;
+                        this.totalPage = parseInt(this.total / 5) + 1;
+
+                    });
+                })
+            },
+            index(i) {
+                if (this.page <= 3 || this.totalPage <= 5) {
+                    return i;
+                } else if (this.page >= this.totalPage - 2) {
+                    return this.totalPage - 5 + i;
+                } else {
+                    return this.page - 3 + i;
+                }
+            },
+            prev() {
+                if (this.page > 1) {
+                    this.page--;
+                }
+            },
+            next() {
+                if (this.page < this.totalPage) {
+                    this.page++;
+                }
+            },
+            goSku(skuId) {
+                var url="http://api.leyou.com/api";
+                ly.http.get(url+"/item/sku/" + skuId
+                ).then(({data}) => { // 这里使用箭头函数
+                    window.location = "http://www.leyou.com/item/"+data.spuId+".html";
+                });
+            }
+        },
+    });
+</script>
+
+<!-- 底部栏位 -->
+<!--页面底部，由js动态加载-->
+<div class="clearfix footer"></div>
+<script type="text/javascript" src="js/plugins/jquery/jquery.min.js"></script>
+<script type="text/javascript">$(".footer").load("foot.html");</script>
+<!--页面底部END-->
+
+<script type="text/javascript" src="js/plugins/jquery.easing/jquery.easing.min.js"></script>
+<script type="text/javascript" src="js/plugins/sui/sui.min.js"></script>
+<script type="text/javascript" src="js/pages/getOrderInfo.js"></script>
+</body>
+
+<!-- 底部栏位 -->
+
+</html>
